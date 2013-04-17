@@ -10,7 +10,8 @@ public class SqrtFunction extends AbstractFunction {
 
     @Override
     public BigDecimal calculate(BigDecimal... arguments) {
-        if (arguments.length != 1) {
+        if (arguments.length < getMinimumArgumentsCount()
+                || arguments.length > getMaximumArgumentsCount()) {
             throw new IllegalArgumentException("Wrong number of arguments in sqrt function: " + arguments.length);
         }
         if (arguments[0].compareTo(BigDecimal.ZERO) < 0) {

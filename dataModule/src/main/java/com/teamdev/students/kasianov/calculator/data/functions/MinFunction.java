@@ -9,7 +9,8 @@ public class MinFunction extends AbstractFunction {
 
     @Override
     public BigDecimal calculate(BigDecimal... arguments) {
-        if (arguments.length < 2) {
+        if (arguments.length < getMinimumArgumentsCount()
+                || arguments.length > getMaximumArgumentsCount()) {
             throw new IllegalArgumentException("Wrong number of arguments in min function. " + arguments.length);
         }
         BigDecimal min = arguments[0];

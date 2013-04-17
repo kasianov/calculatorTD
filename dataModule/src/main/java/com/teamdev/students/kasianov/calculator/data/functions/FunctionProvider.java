@@ -34,4 +34,8 @@ public final class FunctionProvider {
         return null;
     }
 
+    public Function createMainFunction(){
+        return new MainFunction(1,1);
+    }
+
 }

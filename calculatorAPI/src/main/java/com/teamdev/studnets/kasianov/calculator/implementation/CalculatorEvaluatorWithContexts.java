@@ -1,6 +1,7 @@
 package com.teamdev.studnets.kasianov.calculator.implementation;
 
 import com.teamdev.students.kasianov.calculator.data.functions.Function;
+import com.teamdev.students.kasianov.calculator.data.functions.MainFunction;
 import com.teamdev.students.kasianov.calculator.data.operators.BinaryOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +13,11 @@ import java.util.Deque;
 public class CalculatorEvaluatorWithContexts implements Evaluator<MathExpressionException> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExpressionReader.class);
     private final Deque<CalculationContext> contexts = new ArrayDeque<CalculationContext>();
-    private final Deque<FunctionElement> functions = new ArrayDeque<FunctionElement>();
+    private final CalculationContext topContext;
 
     {
-        contexts.push(new CalculationContext(null));
+        topContext = new CalculationContext(new FunctionElement(new MainFunction(1,1)));
+        contexts.push(topContext);
     }
 
     @Override
@@ -27,13 +29,7 @@ public class CalculatorEvaluatorWithContexts implements Evaluator<MathExpression
     @Override
     public void pushFunction(Function function) throws MathExpressionException {
         LOGGER.info("A function is being pushed to the context: " + function);
-        if (!functions.isEmpty()
-                && functions.peek().getArgumentsCount() == 0
-                && !functions.peek().incrementArgumentCount()) {
-            throw new MathExpressionException("Wrong number of arguments");
-        }
-        functions.push(new FunctionElement(function));
-        contexts.push(new CalculationContext(contexts.peek()));
+        contexts.push(new CalculationContext(new FunctionElement(function)));
     }
 
     @Override
@@ -74,23 +70,20 @@ public class CalculatorEvaluatorWithContexts implements Evaluator<MathExpression
     }
 
     private class CalculationContext {
-        private final CalculationContext parent;
+        private final FunctionElement functionElement;
         private final Deque<BigDecimal> numberStack = new ArrayDeque<BigDecimal>();
         private final Deque<BinaryOperator> binaryOperatorStack = new ArrayDeque<BinaryOperator>();
         private final Deque<Integer> leftParenthesesStack = new ArrayDeque<Integer>();
 
-        private CalculationContext(CalculationContext parent) {
-            this.parent = parent;
+        private CalculationContext(FunctionElement functionElement) {
+            this.functionElement = functionElement;
         }
 
         public void pushNumber(BigDecimal number) throws MathExpressionException {
-            //if this context has a parent, then there is a function element at the top of the functions stack
             //if the function's arguments count is 0
             //then try to increment it, and if it fails (doesn't take any arguments), then throw an exception
-            if (parent != null
-                    && functions.peek() != null
-                    && functions.peek().getArgumentsCount() == 0
-                    && !functions.peek().incrementArgumentCount()) {
+            if(functionElement.getArgumentsCount() == 0
+                    && !functionElement.incrementArgumentCount()){
 
                 throw new MathExpressionException("Wrong number of arguments in function");
             }
@@ -117,6 +110,14 @@ public class CalculatorEvaluatorWithContexts implements Evaluator<MathExpression
             binaryOperatorStack.push(binaryOperator);
         }
 
+        public void pushFunction() throws MathExpressionException{
+            if(functionElement.getArgumentsCount() == 0
+                    && !functionElement.incrementArgumentCount()){
+
+                throw new MathExpressionException("Wrong number of arguments in function");
+            }
+        }
+
         public void pushLeftParenthesis() throws MathExpressionException {
             leftParenthesesStack.push(binaryOperatorStack.size());
         }
@@ -131,16 +132,9 @@ public class CalculatorEvaluatorWithContexts implements Evaluator<MathExpression
                 executeBinaryOperator(binaryOperatorStack.pop());
             }
             //true means that it is the closing parenthesis of a function which is on the top of the functions stack
-            if (leftParenthesesStack.isEmpty() && parent != null) {
+            if (leftParenthesesStack.isEmpty() && this != topContext) {
                 contexts.remove(this);
-                //if it is the pi() function, then the result is null
-                BigDecimal result = numberStack.isEmpty() ? null : numberStack.pop();
-                if (result != null) {
-                    //push the result to the parent context
-                    parent.pushNumber(result);
-                }
-                //all arguments for the function are in the parent context, so execute the function from there
-                parent.executeFunction(functions.pop());
+                contexts.peek().pushNumber(getResult());
             }
 
         }
@@ -148,11 +142,11 @@ public class CalculatorEvaluatorWithContexts implements Evaluator<MathExpression
         public void pushFunctionSeparator() throws MathExpressionException {
             //there is always the opening (only one) parenthesis before function separator
             //there is always a parent context
-            if (leftParenthesesStack.size() != 1 || parent == null) {
+            if (leftParenthesesStack.size() != 1 || this == topContext) {
                 throw new MathExpressionException("Function separator is not in a function parentheses");
             }
             //each separator means +1 argument to a function, so check if it can take one more
-            if (!functions.peek().incrementArgumentCount()) {
+            if (!functionElement.incrementArgumentCount()) {
                 throw new MathExpressionException("Wrong number of arguments");
             }
             //get an intermediate result and push it to the parent context
@@ -160,17 +154,17 @@ public class CalculatorEvaluatorWithContexts implements Evaluator<MathExpression
             //is precessed as new one, only leftParenthesesStack contains one element which is the opening
             //parenthesis of the function
             popOperatorsStack();
-            parent.pushNumber(numberStack.pop());
         }
 
         public BigDecimal getResult() throws MathExpressionException {
             if (!leftParenthesesStack.isEmpty()) {
                 throw new MathExpressionException("Mismatched parentheses");
             }
-            popOperatorsStack();
-            //for example:in context for pi() function there is no elements in the numbers stack
-            //otherwise there is always one element after executing all operators
-            return numberStack.isEmpty() ? null : numberStack.pop();
+            if(!binaryOperatorStack.isEmpty()){
+                popOperatorsStack();
+            }
+            executeFunction(functionElement);
+            return numberStack.pop();
         }
 
         public void popOperatorsStack() {

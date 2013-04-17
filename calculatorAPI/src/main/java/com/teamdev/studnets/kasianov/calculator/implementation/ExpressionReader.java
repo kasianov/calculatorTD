@@ -35,7 +35,7 @@ public class ExpressionReader {
 
     public void skipSpaces(){
         while(!isEndOfExpression() && charactersToSkip.contains(expression.charAt(position))){
-            setPosition(++position);
+            ++position;
         }
         previousPositionOffset = 0;
     }
