@@ -56,7 +56,7 @@ public class EvaluationContext implements FiniteStateMachineContext<EvaluationSt
     public BigDecimal getResult() throws EvaluationException {
         try {
             return evaluator.getResult();
-        } catch (Exception ex) {
+        } catch (MathExpressionException ex) {
             throw new EvaluationException(ex.getMessage(), expressionReader.getPosition());
         }
     }
@@ -74,7 +74,7 @@ public class EvaluationContext implements FiniteStateMachineContext<EvaluationSt
     public void pushNumber(BigDecimal number) {
         try {
             evaluator.pushNumber(number);
-        } catch (Exception ex) {
+        } catch (MathExpressionException ex) {
             setError(ex.getMessage());
         }
     }
@@ -82,7 +82,7 @@ public class EvaluationContext implements FiniteStateMachineContext<EvaluationSt
     public void pushFunction(Function function) {
         try {
             evaluator.pushFunction(function);
-        } catch (Exception ex) {
+        } catch (MathExpressionException ex) {
             setError(ex.getMessage());
         }
     }
@@ -90,7 +90,7 @@ public class EvaluationContext implements FiniteStateMachineContext<EvaluationSt
     public void pushBinaryOperator(BinaryOperator binaryOperator) {
         try {
             evaluator.pushBinaryOperator(binaryOperator);
-        } catch (Exception ex) {
+        } catch (MathExpressionException ex) {
             setError(ex.getMessage());
         }
     }
@@ -98,7 +98,7 @@ public class EvaluationContext implements FiniteStateMachineContext<EvaluationSt
     public void pushLeftParenthesis() {
         try {
             evaluator.pushLeftParenthesis();
-        } catch (Exception ex) {
+        } catch (MathExpressionException ex) {
             setError(ex.getMessage());
         }
     }
@@ -106,7 +106,7 @@ public class EvaluationContext implements FiniteStateMachineContext<EvaluationSt
     public void pushRightParenthesis() {
         try {
             evaluator.pushRightParenthesis();
-        } catch (Exception ex) {
+        } catch (MathExpressionException ex) {
             setError(ex.getMessage());
         }
     }
@@ -114,7 +114,31 @@ public class EvaluationContext implements FiniteStateMachineContext<EvaluationSt
     public void pushFunctionSeparator() {
         try {
             evaluator.pushFunctionSeparator();
-        } catch (Exception ex) {
+        } catch (MathExpressionException ex) {
+            setError(ex.getMessage());
+        }
+    }
+
+    public void pushExpressionSeparator(){
+        try {
+            evaluator.pushExpressionSeparator();
+        } catch (MathExpressionException ex) {
+            setError(ex.getMessage());
+        }
+    }
+
+    public void pushEquationSign(){
+        try {
+            evaluator.pushEquationSign();
+        } catch (MathExpressionException ex) {
+            setError(ex.getMessage());
+        }
+    }
+
+    public void pushVariable(String variable){
+        try {
+            evaluator.pushVariable(variable);
+        } catch (MathExpressionException ex) {
             setError(ex.getMessage());
         }
     }
@@ -122,7 +146,7 @@ public class EvaluationContext implements FiniteStateMachineContext<EvaluationSt
     public void popOutStack() {
         try {
             evaluator.popOutStack();
-        } catch (Exception ex) {
+        } catch (MathExpressionException ex) {
             setError(ex.getMessage());
         }
     }

@@ -14,24 +14,42 @@ public class EvaluationTransitionMatrix implements TransitionMatrix<EvaluationSt
     private final Map<EvaluationState, Set<EvaluationState>> evaluationStateSetMap =
             new EnumMap<EvaluationState, Set<EvaluationState>>(EvaluationState.class) {{
                 put(START, EnumSet.of(
+                        FUNCTION,
+                        VARIABLE));
+
+                put(VARIABLE,EnumSet.of(
+                        BINARY_OPERATOR,
+                        EQUATION_SIGN,
+                        RIGHT_PARENTHESIS,
+                        FUNCTION_SEPARATOR,
+                        EXPRESSION_SEPARATOR));
+
+                put(EXPRESSION_SEPARATOR,EnumSet.of(
+                        FUNCTION,
+                        VARIABLE,
+                        FINISH));
+
+                put(EQUATION_SIGN,EnumSet.of(
+                        VARIABLE,
                         NUMBER,
-                        LEFT_PARENTHESIS,
-                        FUNCTION));
+                        FUNCTION,
+                        LEFT_PARENTHESIS));
 
                 put(NUMBER, EnumSet.of(
                         BINARY_OPERATOR,
-                        FINISH,
                         RIGHT_PARENTHESIS,
+                        EXPRESSION_SEPARATOR,
                         FUNCTION_SEPARATOR));
 
                 put(POSITIVE_NUMBER, EnumSet.of(
                         BINARY_OPERATOR,
-                        FINISH,
                         RIGHT_PARENTHESIS,
+                        EXPRESSION_SEPARATOR,
                         FUNCTION_SEPARATOR));
 
                 put(BINARY_OPERATOR, EnumSet.of(
                         POSITIVE_NUMBER,
+                        VARIABLE,
                         LEFT_PARENTHESIS,
                         FUNCTION));
 
@@ -41,22 +59,25 @@ public class EvaluationTransitionMatrix implements TransitionMatrix<EvaluationSt
                 put(FUNCTION_SEPARATOR, EnumSet.of(
                         LEFT_PARENTHESIS,
                         NUMBER,
+                        VARIABLE,
                         FUNCTION));
 
                 put(LEFT_PARENTHESIS, EnumSet.of(
                         NUMBER,
+                        VARIABLE,
                         LEFT_PARENTHESIS,
                         FUNCTION));
 
                 put(LEFT_PARENTHESIS_AFTER_FUNCTION, EnumSet.of(
                         NUMBER,
+                        VARIABLE,
                         LEFT_PARENTHESIS,
                         RIGHT_PARENTHESIS,
                         FUNCTION));
 
                 put(RIGHT_PARENTHESIS, EnumSet.of(
                         BINARY_OPERATOR,
-                        FINISH,
+                        EXPRESSION_SEPARATOR,
                         RIGHT_PARENTHESIS,
                         FUNCTION_SEPARATOR));
             }};

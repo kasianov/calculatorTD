@@ -25,7 +25,9 @@ public class Calculator extends AbstractFiniteStateMachine<EvaluationState,
     public BigDecimal calculate(String mathExpression) throws EvaluationException {
         EvaluationContext context = EvaluationContext.createEvaluationContext(mathExpression);
         run(context);
-        return context.getResult();
+        //todo
+        return null;
+        //return context.getResult();
     }
 
     @Override

@@ -23,6 +23,12 @@ public interface Evaluator<MathException extends Exception> {
 
     void pushFunctionSeparator() throws MathException;
 
+    void pushVariable(String variable) throws MathException;
+
+    void pushExpressionSeparator() throws MathException;
+
+    void pushEquationSign() throws MathException;
+
     void popOutStack() throws MathException;
 
     BigDecimal getResult() throws MathException;

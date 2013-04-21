@@ -8,11 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
 
 public class CalculatorFrame extends JFrame {
-    private JTextField textExpression;
-    private JTextField textResult;
+    private JTextArea textExpression;
     private Calculator calculator;
 
     public CalculatorFrame(Calculator calculator) {
@@ -21,24 +21,27 @@ public class CalculatorFrame extends JFrame {
     }
 
     private void initializeComponents() {
+
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Calculator");
-        setSize(new Dimension(326, 170));
+        setSize(new Dimension(326, 320));
         setResizable(false);
 
         JPanel panel = new JPanel(null);
         setContentPane(panel);
 
-        JLabel labelExpression = new JLabel("Math Expression");
+        JLabel labelExpression = new JLabel("Code");
         labelExpression.setLocation(10, 10);
         labelExpression.setSize(300, 20);
 
-        textExpression = new JTextField();
-        textExpression.setLocation(10, 30);
-        textExpression.setSize(new Dimension(300, 20));
+        textExpression = new JTextArea();
+        textExpression.setMargin(new Insets(5,5,5,5));
+        JScrollPane jScrollPane = new JScrollPane(textExpression);
+        jScrollPane.setSize(new Dimension(300,220));
+        jScrollPane.setLocation(10, 30);
 
-        JButton buttonResult = new JButton("Calculate");
-        buttonResult.setLocation(10, 60);
+        JButton buttonResult = new JButton("Execute");
+        buttonResult.setLocation(10, 260);
         buttonResult.setSize(new Dimension(300, 20));
         buttonResult.addActionListener(new ActionListener() {
             @Override
@@ -47,36 +50,30 @@ public class CalculatorFrame extends JFrame {
             }
         });
 
-        JLabel labelResult = new JLabel("Result");
-        labelResult.setLocation(10, 90);
-        labelResult.setSize(200, 20);
-
-        textResult = new JTextField();
-        textResult.setLocation(10, 110);
-        textResult.setSize(new Dimension(300, 20));
-        textResult.setEditable(false);
-        textResult.setBackground(Color.WHITE);
-
         panel.add(labelExpression);
-        panel.add(textExpression);
+        panel.add(jScrollPane);
         panel.add(buttonResult);
-        panel.add(labelResult);
-        panel.add(textResult);
 
-        getRootPane().setDefaultButton(buttonResult);
+        //getRootPane().setDefaultButton(buttonResult);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
         setBounds(screenSize.width / 2 - getWidth() / 2, screenSize.height / 2 - getHeight() / 2, getWidth(), getHeight());
         setVisible(true);
+
+        getRootPane().getActionMap().put("exe", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonResultClicked(e);
+            }
+        });
+        getRootPane().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ALT | KeyEvent.VK_ENTER,-1),"exe");
     }
 
     private void buttonResultClicked(ActionEvent event) {
-        textResult.setText("");
         if (calculator != null) {
             try {
                 textExpression.setText(textExpression.getText());
-                BigDecimal result = calculator.calculate(textExpression.getText());
-                textResult.setText(result != null ? result.toString(): "NaN");
+                calculator.calculate(textExpression.getText());
             } catch (EvaluationException ex) {
                 String info = ex.getMessage()
                         + "\nPosition: " + ex.getPosition();

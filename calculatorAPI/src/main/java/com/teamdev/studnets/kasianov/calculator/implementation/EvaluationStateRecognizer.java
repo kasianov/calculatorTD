@@ -28,6 +28,9 @@ public class EvaluationStateRecognizer implements StateRecognizer<EvaluationStat
                 put(RIGHT_PARENTHESIS, new RightParenthesisParser());
                 put(FUNCTION_SEPARATOR, new FunctionSeparatorParser());
                 put(FINISH, new EndOfExpressionParser());
+                put(VARIABLE,new VariableParser());
+                put(EXPRESSION_SEPARATOR,new ExpressionSeparatorParser());
+                put(EQUATION_SIGN,new EquationSignParser());
             }};
 
     @Override

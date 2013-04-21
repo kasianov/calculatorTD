@@ -10,6 +10,7 @@ public final class FunctionProvider {
         put("max", new MaxFunction(Integer.MAX_VALUE, 2));
         put("min", new MinFunction(Integer.MAX_VALUE, 2));
         put("pi", new PiFunction(0, 0));
+        put("out",new OutFunction(Integer.MAX_VALUE,1));
     }};
 
     /**
@@ -32,10 +33,6 @@ public final class FunctionProvider {
             }
         }
         return null;
-    }
-
-    public Function createMainFunction(){
-        return new MainFunction(1,1);
     }
 
 }

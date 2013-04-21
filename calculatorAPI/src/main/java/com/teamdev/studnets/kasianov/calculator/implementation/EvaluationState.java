@@ -10,5 +10,8 @@ public enum EvaluationState {
     FUNCTION_SEPARATOR,
     NUMBER,
     POSITIVE_NUMBER,
+    EQUATION_SIGN,
+    EXPRESSION_SEPARATOR,
+    VARIABLE,
     FINISH
 }
